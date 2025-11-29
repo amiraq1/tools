@@ -1,66 +1,21 @@
-import { build as esbuild } from "esbuild";
-import { build as viteBuild } from "vite";
-import { rm, readFile } from "fs/promises";
+import { build } from "tsup";
+import { execSync } from "node:child_process";
+import { mkdirSync, cpSync } from "node:fs";
 
-// server deps to bundle to reduce openat(2) syscalls
-// which helps cold start times
-const allowlist = [
-  "@google/generative-ai",
-  "@neondatabase/serverless",
-  "axios",
-  "connect-pg-simple",
-  "cors",
-  "date-fns",
-  "drizzle-orm",
-  "drizzle-zod",
-  "express",
-  "express-rate-limit",
-  "express-session",
-  "jsonwebtoken",
-  "memorystore",
-  "multer",
-  "nanoid",
-  "nodemailer",
-  "openai",
-  "passport",
-  "passport-local",
-  "uuid",
-  "ws",
-  "xlsx",
-  "zod",
-  "zod-validation-error",
-];
-
-async function buildAll() {
-  await rm("dist", { recursive: true, force: true });
-
-  console.log("building client...");
-  await viteBuild();
-
-  console.log("building server...");
-  const pkg = JSON.parse(await readFile("package.json", "utf-8"));
-  const allDeps = [
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.devDependencies || {}),
-  ];
-  const externals = allDeps.filter((dep) => !allowlist.includes(dep));
-
-  await esbuild({
-    entryPoints: ["server/index.ts"],
-    platform: "node",
-    bundle: true,
-    format: "cjs",
-    outfile: "dist/index.cjs",
-    define: {
-      "process.env.NODE_ENV": '"production"',
-    },
-    minify: true,
-    external: externals,
-    logLevel: "info",
-  });
-}
-
-buildAll().catch((err) => {
-  console.error(err);
-  process.exit(1);
+// 1) Build backend
+await build({
+  entry: ["server/index.ts"],
+  clean: true,
+  outDir: "dist",
+  format: ["cjs"],
 });
+
+// 2) Build frontend using Vite
+console.log("Building frontend...");
+execSync("vite build", { stdio: "inherit" });
+
+// 3) Copy frontend dist to server dist/public
+console.log("Copying frontend to dist/public...");
+mkdirSync("dist/public", { recursive: true });
+cpSync("public", "dist/public", { recursive: true });
+cpSync("dist/client", "dist/public", { recursive: true });

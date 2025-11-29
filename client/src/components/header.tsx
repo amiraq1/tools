@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X, Bell, Sparkles } from "lucide-react";
+import { Search, Menu, X, Bell, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -51,12 +51,21 @@ export function Header({ tools }: HeaderProps) {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex h-14 items-center gap-4">
-            {/* الشعار / اسم الموقع */}
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+            {/* الشعار / اسم الموقع - محسّن */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="w-4.5 h-4.5 text-white"
+                >
+                  <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z" />
+                  <path d="M12 7v5l3.536 3.536" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </div>
-              <span className="font-bold text-lg hidden sm:block">نبض</span>
+              <span className="font-bold text-lg hidden sm:block bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">نبض</span>
             </Link>
 
             {/* التصنيفات الرئيسية (ديسكتوب) */}
@@ -107,7 +116,7 @@ export function Header({ tools }: HeaderProps) {
               ))}
             </div>
 
-            {/* يمين الهيدر (الإشعارات، الثيم، الدخول) */}
+            {/* يمين الهيدر (الإشعارات، الثيم، الإعدادات، الدخول) */}
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
@@ -118,6 +127,16 @@ export function Header({ tools }: HeaderProps) {
                 <Bell className="w-5 h-5" />
               </Button>
               <ThemeToggle />
+              <Link href="/settings">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden md:flex"
+                  data-testid="button-settings"
+                >
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="sm"
@@ -188,20 +207,32 @@ export function Header({ tools }: HeaderProps) {
                   </Link>
                 ))}
               </div>
-              <div className="pt-4 border-t flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  data-testid="mobile-button-login"
-                >
-                  تسجيل الدخول
-                </Button>
-                <Button
-                  className="flex-1"
-                  data-testid="mobile-button-signup"
-                >
-                  إنشاء حساب
-                </Button>
+              <div className="pt-4 border-t space-y-2">
+                <Link href="/settings" className="block">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    data-testid="mobile-button-settings"
+                  >
+                    <Settings className="w-4 h-4" />
+                    الإعدادات
+                  </Button>
+                </Link>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    data-testid="mobile-button-login"
+                  >
+                    تسجيل الدخول
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    data-testid="mobile-button-signup"
+                  >
+                    إنشاء حساب
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

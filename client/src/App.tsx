@@ -13,6 +13,7 @@ import Category from "@/pages/category";
 import Leaderboard from "@/pages/leaderboard";
 import Trending from "@/pages/trending";
 import Popular from "@/pages/popular";
+import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/trending" component={Trending} />
       <Route path="/popular" component={Popular} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );

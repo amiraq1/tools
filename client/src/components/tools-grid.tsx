@@ -49,9 +49,9 @@ export function ToolsGrid({ tools, isLoading }: ToolsGridProps) {
   if (tools.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground text-lg">No tools found</p>
+        <p className="text-muted-foreground text-lg">لم يتم العثور على أدوات</p>
         <p className="text-muted-foreground text-sm mt-1">
-          Try adjusting your filters or search query
+          حاول تغيير الفلاتر أو استعلام البحث
         </p>
       </div>
     );

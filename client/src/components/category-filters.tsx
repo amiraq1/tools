@@ -66,7 +66,7 @@ export function CategoryFilters({ selectedCategory, onCategoryChange }: Category
           onClick={() => onCategoryChange?.(undefined)}
           data-testid="filter-all"
         >
-          All
+          الكل
         </Badge>
         {categoryConfig.map(({ name, icon: Icon, color }) => (
           <Badge

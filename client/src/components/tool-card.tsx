@@ -78,7 +78,7 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold truncate">{tool.name}</h3>
-                <Badge variant="secondary" className="text-xs shrink-0">Featured</Badge>
+                <Badge variant="secondary" className="text-xs shrink-0">مميز</Badge>
               </div>
               <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{tool.tagline}</p>
             </div>
@@ -159,7 +159,7 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
 
       <div className="border-t px-4 py-3 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span className="text-xs">Released {formatTimeAgo(tool.releasedAt)}</span>
+          <span className="text-xs">أطلق {formatTimeAgo(tool.releasedAt)}</span>
           <Badge className={cn("text-xs", getPricingColor(tool.pricing))}>
             {tool.pricing}
             {tool.priceDetails && ` ${tool.priceDetails}`}

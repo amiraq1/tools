@@ -24,6 +24,7 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     const savedTools = JSON.parse(localStorage.getItem("nabdh-saved-tools") || "[]");
     if (savedTools.includes(tool.id)) {
       const updated = savedTools.filter((id: string) => id !== tool.id);
@@ -36,7 +37,8 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
     }
   };
 
-  const handleCardClick = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     navigate(`/tool/${tool.slug}`);
   };
 
@@ -142,7 +144,10 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mt-0.5"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
               data-testid={`link-website-${tool.id}`}
             >
               زيارة الموقع <ExternalLink className="w-3 h-3" />
@@ -165,7 +170,10 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
               data-testid={`button-share-${tool.id}`}
             >
               <Share2 className="w-4 h-4" />

@@ -137,21 +137,25 @@ export function Header({ tools }: HeaderProps) {
                   <Settings className="w-5 h-5" />
                 </Button>
               </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden md:flex"
-                data-testid="button-login"
-              >
-                تسجيل الدخول
-              </Button>
-              <Button
-                size="sm"
-                className="hidden md:flex"
-                data-testid="button-signup"
-              >
-                إنشاء حساب
-              </Button>
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden md:flex"
+                  data-testid="button-login"
+                >
+                  تسجيل الدخول
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button
+                  size="sm"
+                  className="hidden md:flex"
+                  data-testid="button-signup"
+                >
+                  إنشاء حساب
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
@@ -219,19 +223,23 @@ export function Header({ tools }: HeaderProps) {
                   </Button>
                 </Link>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    data-testid="mobile-button-login"
-                  >
-                    تسجيل الدخول
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    data-testid="mobile-button-signup"
-                  >
-                    إنشاء حساب
-                  </Button>
+                  <Link href="/login" className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      data-testid="mobile-button-login"
+                    >
+                      تسجيل الدخول
+                    </Button>
+                  </Link>
+                  <Link href="/signup" className="flex-1">
+                    <Button
+                      className="w-full"
+                      data-testid="mobile-button-signup"
+                    >
+                      إنشاء حساب
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

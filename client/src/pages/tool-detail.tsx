@@ -159,7 +159,7 @@ export default function ToolDetail() {
                       {tool.name}
                     </h1>
                     {tool.isFeatured && (
-                      <Badge variant="secondary">مميز</Badge>
+                      <Badge variant="secondary">مميزة</Badge>
                     )}
                     {tool.isNew && (
                       <Badge className="bg-emerald-500/10 text-emerald-500">

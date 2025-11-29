@@ -104,7 +104,7 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold truncate">{tool.name}</h3>
-              <Badge variant="secondary" className="text-xs shrink-0">نبض</Badge>
+              <Badge variant="secondary" className="text-xs shrink-0">مميز</Badge>
             </div>
             <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{tool.tagline}</p>
           </div>
@@ -128,7 +128,7 @@ export function ToolCard({ tool, variant = "default" }: ToolCardProps) {
                 {tool.name}
               </h3>
               {tool.isFeatured && (
-                <Badge variant="secondary" className="text-xs">نبض</Badge>
+                <Badge variant="secondary" className="text-xs">مميز</Badge>
               )}
               {tool.isNew && (
                 <Badge className="bg-emerald-500/10 text-emerald-500 text-xs">جديد</Badge>

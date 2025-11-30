@@ -22,6 +22,10 @@ localPort = 3000
 localPort = 5000
 
 [[ports]]
+localPort = 38207
+externalPort = 80
+
+[[ports]]
 localPort = 39781
 
 # تشغيل زر Run في واجهة Replit

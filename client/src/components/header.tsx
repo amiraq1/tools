@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X, Bell, Settings } from "lucide-react";
+import { Search, Menu, X, Bell, Settings, Bookmark, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchModal } from "@/components/search-modal";
+import { useAuth } from "@/hooks/use-auth";
 import type { AITool } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +29,8 @@ const navLinks = [
 export function Header({ tools }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
+  const { user, isAuthenticated, logout, savedToolIds } = useAuth();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -119,6 +121,23 @@ export function Header({ tools }: HeaderProps) {
 
             {/* يمين الهيدر (الإشعارات، الثيم، الإعدادات، الدخول) */}
             <div className="flex items-center gap-1">
+              {isAuthenticated && (
+                <Link href="/saved">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hidden md:flex relative"
+                    data-testid="button-saved-tools"
+                  >
+                    <Bookmark className="w-5 h-5" />
+                    {savedToolIds.length > 0 && (
+                      <span className="absolute -top-1 -left-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center">
+                        {savedToolIds.length}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -138,25 +157,53 @@ export function Header({ tools }: HeaderProps) {
                   <Settings className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hidden md:flex"
-                  data-testid="button-login"
-                >
-                  تسجيل الدخول
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button
-                  size="sm"
-                  className="hidden md:flex"
-                  data-testid="button-signup"
-                >
-                  إنشاء حساب
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden md:flex gap-2"
+                    data-testid="button-user"
+                  >
+                    <User className="w-4 h-4" />
+                    {user?.username}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hidden md:flex"
+                    onClick={async () => {
+                      await logout();
+                      navigate("/");
+                    }}
+                    data-testid="button-logout"
+                  >
+                    <LogOut className="w-5 h-5" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hidden md:flex"
+                      data-testid="button-login"
+                    >
+                      تسجيل الدخول
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button
+                      size="sm"
+                      className="hidden md:flex"
+                      data-testid="button-signup"
+                    >
+                      إنشاء حساب
+                    </Button>
+                  </Link>
+                </>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -213,6 +260,23 @@ export function Header({ tools }: HeaderProps) {
                 ))}
               </div>
               <div className="pt-4 border-t space-y-2">
+                {isAuthenticated && (
+                  <Link href="/saved" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2"
+                      data-testid="mobile-button-saved"
+                    >
+                      <Bookmark className="w-4 h-4" />
+                      الأدوات المحفوظة
+                      {savedToolIds.length > 0 && (
+                        <Badge variant="secondary" className="mr-auto">
+                          {savedToolIds.length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </Link>
+                )}
                 <Link href="/settings" className="block">
                   <Button
                     variant="outline"
@@ -223,25 +287,50 @@ export function Header({ tools }: HeaderProps) {
                     الإعدادات
                   </Button>
                 </Link>
-                <div className="flex gap-2">
-                  <Link href="/login" className="flex-1">
+                {isAuthenticated ? (
+                  <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      className="w-full"
-                      data-testid="mobile-button-login"
+                      className="flex-1 gap-2"
+                      data-testid="mobile-button-user"
                     >
-                      تسجيل الدخول
+                      <User className="w-4 h-4" />
+                      {user?.username}
                     </Button>
-                  </Link>
-                  <Link href="/signup" className="flex-1">
                     <Button
-                      className="w-full"
-                      data-testid="mobile-button-signup"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={async () => {
+                        await logout();
+                        navigate("/");
+                      }}
+                      data-testid="mobile-button-logout"
                     >
-                      إنشاء حساب
+                      <LogOut className="w-4 h-4" />
+                      خروج
                     </Button>
-                  </Link>
-                </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Link href="/login" className="flex-1">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        data-testid="mobile-button-login"
+                      >
+                        تسجيل الدخول
+                      </Button>
+                    </Link>
+                    <Link href="/signup" className="flex-1">
+                      <Button
+                        className="w-full"
+                        data-testid="mobile-button-signup"
+                      >
+                        إنشاء حساب
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Home = lazy(() => import("@/pages/home"));
@@ -13,6 +14,7 @@ const Category = lazy(() => import("@/pages/category"));
 const Leaderboard = lazy(() => import("@/pages/leaderboard"));
 const Trending = lazy(() => import("@/pages/trending"));
 const Popular = lazy(() => import("@/pages/popular"));
+const SavedTools = lazy(() => import("@/pages/saved-tools"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Login = lazy(() => import("@/pages/login"));
 const Signup = lazy(() => import("@/pages/signup"));
@@ -47,6 +49,7 @@ function Router() {
         <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/trending" component={Trending} />
         <Route path="/popular" component={Popular} />
+        <Route path="/saved" component={SavedTools} />
         <Route path="/settings" component={Settings} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
@@ -70,12 +73,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="nabdh-theme">
-        <TooltipProvider>
-          <Toaster />
-          <div dir="rtl" className="min-h-screen font-sans page-enter">
-            <Router />
-          </div>
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <div dir="rtl" className="min-h-screen font-sans page-enter">
+              <Router />
+            </div>
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

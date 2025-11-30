@@ -1,10 +1,11 @@
-import { useState, useEffect, memo, useCallback } from "react";
+import { memo, useCallback } from "react";
 import { useLocation } from "wouter";
 import { ExternalLink, Bookmark, Share2, ArrowUp, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ToolIcon } from "@/components/tool-icon";
+import { useAuth } from "@/hooks/use-auth";
 import type { AITool } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
@@ -49,27 +50,18 @@ const getPricingColor = (pricing: string) => {
 
 function ToolCardComponent({ tool, variant = "default" }: ToolCardProps) {
   const [, navigate] = useLocation();
-  const [isSaved, setIsSaved] = useState(false);
+  const { isToolSaved, saveTool, unsaveTool } = useAuth();
+  const isSaved = isToolSaved(tool.id);
 
-  useEffect(() => {
-    const savedTools = JSON.parse(localStorage.getItem("nabdh-saved-tools") || "[]");
-    setIsSaved(savedTools.includes(tool.id));
-  }, [tool.id]);
-
-  const handleSave = useCallback((e: React.MouseEvent) => {
+  const handleSave = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    const savedTools = JSON.parse(localStorage.getItem("nabdh-saved-tools") || "[]");
-    if (savedTools.includes(tool.id)) {
-      const updated = savedTools.filter((id: string) => id !== tool.id);
-      localStorage.setItem("nabdh-saved-tools", JSON.stringify(updated));
-      setIsSaved(false);
+    if (isSaved) {
+      await unsaveTool(tool.id);
     } else {
-      savedTools.push(tool.id);
-      localStorage.setItem("nabdh-saved-tools", JSON.stringify(savedTools));
-      setIsSaved(true);
+      await saveTool(tool.id);
     }
-  }, [tool.id]);
+  }, [tool.id, isSaved, saveTool, unsaveTool]);
 
   const handleCardClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();

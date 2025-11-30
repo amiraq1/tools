@@ -15,10 +15,13 @@ deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
-# ربط منفذ واحد فقط (5000 داخلي ← 80 خارجي)
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 39781
+externalPort = 3000
 
 # تشغيل زر Run في واجهة Replit
 [workflows]

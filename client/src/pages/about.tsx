@@ -79,6 +79,21 @@ export default function About() {
             ))}
           </div>
 
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <h2 className="text-xl font-semibold mb-4">المؤسس والمدير</h2>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-2xl font-bold">
+                  ع
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">عمار محمد</h3>
+                  <p className="text-muted-foreground">مؤسس ومدير موقع نبض</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-xl font-semibold mb-4">قصتنا</h2>

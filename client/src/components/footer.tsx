@@ -170,9 +170,10 @@ export function Footer() {
               </Button>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground text-center sm:text-start">
-            © {new Date().getFullYear()} نبض - دليل أدوات الذكاء الاصطناعي. جميع الحقوق محفوظة.
-          </p>
+          <div className="text-sm text-muted-foreground text-center sm:text-start">
+            <p>© {new Date().getFullYear()} نبض - دليل أدوات الذكاء الاصطناعي. جميع الحقوق محفوظة.</p>
+            <p className="mt-1">بإدارة <span className="font-semibold text-foreground">عمار محمد</span></p>
+          </div>
         </div>
       </div>
     </footer>

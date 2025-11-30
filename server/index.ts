@@ -137,11 +137,18 @@ function errorHandler(
       await setupVite(httpServer, app);
     }
 
-    const port = Number.parseInt(process.env.PORT ?? "3000", 10);
+    const port = Number.parseInt(process.env.PORT ?? "5000", 10);
 
-    httpServer.listen(port, "0.0.0.0", () => {
-      log(`Server listening on port ${port}`, "http");
-    });
+    httpServer.listen(
+      {
+        port,
+        host: "0.0.0.0",
+        reusePort: true,
+      },
+      () => {
+        log(`serving on port ${port}`);
+      },
+    );
   } catch (err) {
     console.error("Fatal error during server startup:", err);
     process.exit(1);

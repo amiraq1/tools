@@ -8,6 +8,14 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const savedTools = pgTable("saved_tools", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  toolId: varchar("tool_id").notNull(),
+  savedAt: timestamp("saved_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -15,8 +23,15 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+export const insertSavedToolSchema = createInsertSchema(savedTools).pick({
+  userId: true,
+  toolId: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type SavedTool = typeof savedTools.$inferSelect;
+export type InsertSavedTool = z.infer<typeof insertSavedToolSchema>;
 
 // AI Tool Categories
 export const categories = [

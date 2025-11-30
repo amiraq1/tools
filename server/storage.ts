@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type AITool, type SearchQuery, type ToolsResponse, type FeaturedToolsResponse, categories, pricingTypes } from "@shared/schema";
+import { type User, type InsertUser, type AITool, type SearchQuery, type ToolsResponse, type FeaturedToolsResponse, type SavedTool, categories, pricingTypes } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -12,6 +12,13 @@ export interface IStorage {
   searchTools(query: SearchQuery): Promise<ToolsResponse>;
   getFeaturedTools(): Promise<FeaturedToolsResponse>;
   getRelatedTools(category: string, excludeId?: string): Promise<AITool[]>;
+  
+  // Saved tools
+  saveTool(userId: string, toolId: string): Promise<SavedTool>;
+  unsaveTool(userId: string, toolId: string): Promise<boolean>;
+  getSavedTools(userId: string): Promise<AITool[]>;
+  isToolSaved(userId: string, toolId: string): Promise<boolean>;
+  getSavedToolIds(userId: string): Promise<string[]>;
 }
 
 const toolScreenshots: Record<string, string[]> = {
@@ -1633,10 +1640,12 @@ const generateMockTools = (): AITool[] => {
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private tools: AITool[];
+  private savedToolsMap: Map<string, Set<string>>; // userId -> Set of toolIds
 
   constructor() {
     this.users = new Map();
     this.tools = generateMockTools();
+    this.savedToolsMap = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -1738,6 +1747,46 @@ export class MemStorage implements IStorage {
     return this.tools
       .filter((tool) => tool.category === category && tool.id !== excludeId)
       .slice(0, 6);
+  }
+
+  async saveTool(userId: string, toolId: string): Promise<SavedTool> {
+    if (!this.savedToolsMap.has(userId)) {
+      this.savedToolsMap.set(userId, new Set());
+    }
+    this.savedToolsMap.get(userId)!.add(toolId);
+    
+    return {
+      id: randomUUID(),
+      userId,
+      toolId,
+      savedAt: new Date(),
+    };
+  }
+
+  async unsaveTool(userId: string, toolId: string): Promise<boolean> {
+    const userSaved = this.savedToolsMap.get(userId);
+    if (userSaved) {
+      return userSaved.delete(toolId);
+    }
+    return false;
+  }
+
+  async getSavedTools(userId: string): Promise<AITool[]> {
+    const savedIds = this.savedToolsMap.get(userId);
+    if (!savedIds || savedIds.size === 0) {
+      return [];
+    }
+    return this.tools.filter((tool) => savedIds.has(tool.id));
+  }
+
+  async isToolSaved(userId: string, toolId: string): Promise<boolean> {
+    const userSaved = this.savedToolsMap.get(userId);
+    return userSaved ? userSaved.has(toolId) : false;
+  }
+
+  async getSavedToolIds(userId: string): Promise<string[]> {
+    const savedIds = this.savedToolsMap.get(userId);
+    return savedIds ? Array.from(savedIds) : [];
   }
 }
 

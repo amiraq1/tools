@@ -75,6 +75,74 @@ export async function registerRoutes(
     });
   });
 
+  // Saved tools routes
+  app.get("/api/saved-tools", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      const tools = await storage.getSavedTools(req.session.userId);
+      res.json({ tools });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/saved-tools/ids", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      const ids = await storage.getSavedToolIds(req.session.userId);
+      res.json({ ids });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/saved-tools/:toolId", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      const { toolId } = req.params;
+      const tool = await storage.getToolById(toolId);
+      if (!tool) {
+        return res.status(404).json({ error: "Tool not found" });
+      }
+      const savedTool = await storage.saveTool(req.session.userId, toolId);
+      res.json({ success: true, savedTool });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/saved-tools/:toolId", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      const { toolId } = req.params;
+      const removed = await storage.unsaveTool(req.session.userId, toolId);
+      res.json({ success: removed });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/saved-tools/check/:toolId", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.json({ isSaved: false });
+      }
+      const { toolId } = req.params;
+      const isSaved = await storage.isToolSaved(req.session.userId, toolId);
+      res.json({ isSaved });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Get all tools with optional filters
   app.get("/api/tools", async (req, res) => {
     try {

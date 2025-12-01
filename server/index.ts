@@ -7,8 +7,6 @@ import session from "express-session";
 
 import MemoryStore from "memorystore";
 import { registerRoutes } from "./routes";
-import { serveStatic } from "./static";
-import { setupVite } from "./vite";
 import { createServer, type IncomingMessage } from "http";
 
 const app = express();
@@ -68,20 +66,31 @@ export function log(message: string, source = "express") {
 // سجّل الروتس
 registerRoutes(app);
 
-// 🔴 هنا كان الخطأ في الغالب: استخدام 5000 فقط
-// ✅ الحل: استخدام process.env.PORT الذي يوفره Replit
-const PORT = Number(process.env.PORT) || 5000;
+// Setup based on environment
+async function startServer() {
+  if (process.env.NODE_ENV === "production") {
+    // In production, serve static built files
+    const { serveStatic } = await import("./static");
+    serveStatic(app);
+  } else {
+    // In development, try to setup Vite, but don't fail if it can't
+    try {
+      const { setupVite } = await import("./vite");
+      await setupVite(httpServer, app);
+    } catch (error) {
+      log(`⚠️ Vite setup skipped (running API server only): ${error instanceof Error ? error.message : "Unknown error"}`, "express");
+    }
+  }
 
-// Setup Vite or static files based on environment
-if (process.env.NODE_ENV === "production") {
-  serveStatic(app);
-} else {
-  // In development, use Vite middleware
-  setupVite(httpServer, app);
+  const PORT = Number(process.env.PORT) || 5000;
+  httpServer.listen(PORT, () => {
+    log(`Server listening on port ${PORT}`, "http");
+  });
 }
 
-httpServer.listen(PORT, () => {
-  log(`Server listening on port ${PORT}`, "http");
+startServer().catch((error) => {
+  log(`❌ Failed to start server: ${error instanceof Error ? error.message : "Unknown error"}`, "express");
+  process.exit(1);
 });
 
 export { app, httpServer };

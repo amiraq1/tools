@@ -8,6 +8,7 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
+import { setupVite } from "./vite";
 import { createServer, type IncomingMessage } from "http";
 
 const app = express();
@@ -64,13 +65,20 @@ export function log(message: string, source = "express") {
   console.log(`[${time}] [${source}] ${message}`);
 }
 
-// سجّل الروتس و الملفات الستاتيك
+// سجّل الروتس
 registerRoutes(app);
-serveStatic(app);
 
 // 🔴 هنا كان الخطأ في الغالب: استخدام 5000 فقط
 // ✅ الحل: استخدام process.env.PORT الذي يوفره Replit
 const PORT = Number(process.env.PORT) || 5000;
+
+// Setup Vite or static files based on environment
+if (process.env.NODE_ENV === "production") {
+  serveStatic(app);
+} else {
+  // In development, use Vite middleware
+  setupVite(httpServer, app);
+}
 
 httpServer.listen(PORT, () => {
   log(`Server listening on port ${PORT}`, "http");

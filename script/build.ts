@@ -9,19 +9,26 @@ const allDeps = [
   ...Object.keys(pkg.devDependencies || {}),
 ];
 
-console.log("Building backend...");
-await build({
-  entry: ["server/index.ts"],
-  clean: true,
-  outDir: "dist",
-  format: ["cjs"],
-  platform: "node",
-  target: "node20",
-  external: [...allDeps, "./vite", "../vite.config"],
-  skipNodeModulesBundle: true,
+async function main() {
+  console.log("Building backend...");
+  await build({
+    entry: ["server/index.ts"],
+    clean: true,
+    outDir: "dist",
+    format: ["cjs"],
+    platform: "node",
+    target: "node20",
+    external: [...allDeps, "./vite", "../vite.config"],
+    skipNodeModulesBundle: true,
+  });
+
+  console.log("Building frontend...");
+  execSync("vite build", { stdio: "inherit" });
+
+  console.log("Build completed successfully!");
+}
+
+main().catch((err) => {
+  console.error("Build failed:", err);
+  process.exit(1);
 });
-
-console.log("Building frontend...");
-execSync("vite build", { stdio: "inherit" });
-
-console.log("Build completed successfully!");

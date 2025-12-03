@@ -41,9 +41,15 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+// Validate session secret in production
+if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+  log("❌ SESSION_SECRET must be set in production environment.", "express");
+  process.exit(1);
+}
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "nabdh-secret-key-change-in-production",
+    secret: process.env.SESSION_SECRET || "dev-secret-key-only-for-development",
     resave: false,
     saveUninitialized: false,
     store: new SessionStore({
@@ -52,6 +58,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
+      sameSite: "strict", // CSRF protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
   }),

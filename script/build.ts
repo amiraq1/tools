@@ -23,7 +23,7 @@ async function main() {
   });
 
   console.log("Building frontend...");
-  execSync("vite build", { stdio: "inherit" });
+  execSync("npx vite build", { stdio: "inherit" });
 
   console.log("Build completed successfully!");
 }

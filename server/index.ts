@@ -4,6 +4,7 @@ import express, {
   type NextFunction,
 } from "express";
 import session from "express-session";
+import compression from "compression";
 
 import MemoryStore from "memorystore";
 import { registerRoutes } from "./routes";
@@ -11,6 +12,18 @@ import { createServer, type IncomingMessage } from "http";
 
 const app = express();
 const httpServer = createServer(app);
+
+// Enable response compression for better performance
+app.use(compression({
+  level: 6, // Balanced compression level
+  threshold: 1024, // Only compress responses larger than 1KB
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  }
+}));
 
 const SessionStore = MemoryStore(session);
 
@@ -31,15 +44,27 @@ declare module "express-session" {
   }
 }
 
+// Optimize JSON parsing with limit
 app.use(
   express.json({
+    limit: '10mb', // Set reasonable limit
     verify: (req: Request, _res: Response, buf: Buffer) => {
       req.rawBody = buf;
     },
   }),
 );
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+
+// Add caching headers for static API responses
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Cache GET requests for public endpoints
+  if (req.method === 'GET' && req.path.startsWith('/api/tools')) {
+    // Cache for 5 minutes for tools listings
+    res.set('Cache-Control', 'public, max-age=300');
+  }
+  next();
+});
 
 // Validate session secret in production
 if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
@@ -71,7 +96,7 @@ export function log(message: string, source = "express") {
 }
 
 // سجّل الروتس
-registerRoutes(app);
+registerRoutes(httpServer, app);
 
 // Setup based on environment
 async function startServer() {

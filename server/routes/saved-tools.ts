@@ -22,6 +22,9 @@ export function registerSavedToolsRoutes(app: Express): void {
    */
   app.get("/api/saved-tools", requireAuth, async (req, res) => {
     try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
       const tools = await storage.getSavedTools(req.session.userId);
       res.json({ tools });
     } catch (error: any) {
@@ -36,6 +39,9 @@ export function registerSavedToolsRoutes(app: Express): void {
    */
   app.get("/api/saved-tools/ids", requireAuth, async (req, res) => {
     try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
       const ids = await storage.getSavedToolIds(req.session.userId);
       res.json({ ids });
     } catch (error: any) {
@@ -50,6 +56,9 @@ export function registerSavedToolsRoutes(app: Express): void {
    */
   app.post("/api/saved-tools/:toolId", requireAuth, async (req, res) => {
     try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
       const { toolId } = req.params;
       const tool = await storage.getToolById(toolId);
       if (!tool) {
@@ -69,6 +78,9 @@ export function registerSavedToolsRoutes(app: Express): void {
    */
   app.delete("/api/saved-tools/:toolId", requireAuth, async (req, res) => {
     try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
       const { toolId } = req.params;
       const removed = await storage.unsaveTool(req.session.userId, toolId);
       res.json({ success: removed });

@@ -71,7 +71,7 @@ export function log(message: string, source = "express") {
 }
 
 // سجّل الروتس
-registerRoutes(app);
+registerRoutes(httpServer, app);
 
 // Setup based on environment
 async function startServer() {

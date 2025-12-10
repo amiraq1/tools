@@ -1,9 +1,15 @@
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { scrypt, randomBytes, timingSafeEqual, type ScryptOptions } from "crypto";
 import { promisify } from "util";
 
-const scryptAsync = promisify(scrypt);
+// Type assertion to handle the promisified scrypt with options parameter
+const scryptAsync = promisify(scrypt) as (
+  password: string,
+  salt: string,
+  keylen: number,
+  options: ScryptOptions
+) => Promise<Buffer>;
 
-const SCRYPT_OPTIONS = {
+const SCRYPT_OPTIONS: ScryptOptions = {
   N: 16384,
   r: 8,
   p: 1,

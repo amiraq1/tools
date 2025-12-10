@@ -1722,11 +1722,22 @@ export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private tools: AITool[];
   private savedToolsMap: Map<string, Set<string>>; // userId -> Set of toolIds
+  
+  // Performance optimization: Cache frequently accessed data
+  private toolsBySlug: Map<string, AITool>;
+  private toolsById: Map<string, AITool>;
+  private cachedFeatured: FeaturedToolsResponse | null = null;
+  private cachedFeaturedTime: number = 0;
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     this.users = new Map();
     this.tools = generateMockTools();
     this.savedToolsMap = new Map();
+    
+    // Build indexes for fast lookups
+    this.toolsBySlug = new Map(this.tools.map(tool => [tool.slug, tool]));
+    this.toolsById = new Map(this.tools.map(tool => [tool.id, tool]));
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -1757,11 +1768,13 @@ export class MemStorage implements IStorage {
   }
 
   async getToolBySlug(slug: string): Promise<AITool | undefined> {
-    return this.tools.find((tool) => tool.slug === slug);
+    // Use index for O(1) lookup instead of O(n) search
+    return this.toolsBySlug.get(slug);
   }
 
   async getToolById(id: string): Promise<AITool | undefined> {
-    return this.tools.find((tool) => tool.id === id);
+    // Use index for O(1) lookup instead of O(n) search
+    return this.toolsById.get(id);
   }
 
   async searchTools(query: SearchQuery): Promise<ToolsResponse> {
@@ -1821,13 +1834,22 @@ export class MemStorage implements IStorage {
   }
 
   async getFeaturedTools(): Promise<FeaturedToolsResponse> {
+    // Use cache for featured tools (they don't change often)
+    const now = Date.now();
+    if (this.cachedFeatured && (now - this.cachedFeaturedTime) < this.CACHE_TTL) {
+      return this.cachedFeatured;
+    }
+
     const featured = this.tools.filter((tool) => tool.isFeatured).slice(0, 8);
     const trending = this.tools.filter((tool) => tool.isTrending).slice(0, 8);
     const justReleased = [...this.tools]
       .sort((a, b) => new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime())
       .slice(0, 8);
 
-    return { featured, trending, justReleased };
+    this.cachedFeatured = { featured, trending, justReleased };
+    this.cachedFeaturedTime = now;
+    
+    return this.cachedFeatured;
   }
 
   async getRelatedTools(category: string, excludeId?: string): Promise<AITool[]> {
